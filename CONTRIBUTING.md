@@ -21,7 +21,7 @@ El PR debe mostrar el issue o pedido, el plan aprobado, los criterios de aceptac
 
 ## Automatización recomendada
 
-Cuando exista un proyecto compilable, configurar CI para compilar y ejecutar pruebas en cada PR. Después configurar una regla de protección para `main` que requiera PR, comprobaciones exitosas y revisión. Las reglas escritas orientan a la IA; la protección de GitHub y CI hacen cumplir las condiciones de integración.
+Cuando exista un proyecto compilable, configurar CI para compilar y ejecutar pruebas en cada PR. Después configurar una regla de protección para `main` que requiera PR y comprobaciones exitosas. Exigir una aprobación formal en GitHub solo si existe un revisor distinto del autor con los permisos necesarios; el autor no puede aprobar su propio PR. Las reglas escritas orientan a la IA; la protección de GitHub y CI hacen cumplir las condiciones de integración.
 
 ## Excepciones
 
