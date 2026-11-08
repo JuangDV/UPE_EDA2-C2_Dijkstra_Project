@@ -1,0 +1,78 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{896AD14B-39F7-43B7-A167-F6C887EB22B0}</ProjectGuid>
+        <ProjectVersion>20.1</ProjectVersion>
+        <FrameworkType>None</FrameworkType>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win64x</Platform>
+        <ProjectName Condition="'$(ProjectName)'==''">SistemaLogistico</ProjectName>
+        <TargetedPlatforms>1048576</TargetedPlatforms>
+        <AppType>Console</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64x' and '$(Base)'=='true') or '$(Base_Win64x)'!=''">
+        <Base_Win64x>true</Base_Win64x>
+        <CfgParent>Base</CfgParent>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <ProjectType>CppConsoleApplication</ProjectType>
+        <SanitizedProjectName>SistemaLogistico</SanitizedProjectName>
+        <IntermediateOutputDir>.\build\$(Platform)\$(Config)</IntermediateOutputDir>
+        <FinalOutputDir>.\build\$(Platform)\$(Config)</FinalOutputDir>
+        <IncludePath>src\Modelo\;$(IncludePath)</IncludePath>
+        <Multithreaded>true</Multithreaded>
+        <DynamicRTL>false</DynamicRTL>
+        <UsePackages>false</UsePackages>
+        <BCC_LanguageStandard>c++23</BCC_LanguageStandard>
+        <BCC_EnableCPPExceptions>true</BCC_EnableCPPExceptions>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64x)'!=''">
+        <ILINK_LibraryPath>$(BDSLIB)\win64x\release;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <Defines>_DEBUG;$(Defines)</Defines>
+        <BCC_OptimizeForSpeed>false</BCC_OptimizeForSpeed>
+        <BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+        <BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
+        <BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+        <BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
+        <BCC_StackFrames>true</BCC_StackFrames>
+        <ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+        <ILINK_LibraryPath>$(BDSLIB)\win64x\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <Defines>NDEBUG;$(Defines)</Defines>
+        <BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
+        <BCC_DisableOptimizations>false</BCC_DisableOptimizations>
+    </PropertyGroup>
+    <ItemGroup>
+        <CppCompile Include="src\SistemaLogistico.cpp"><BuildOrder>0</BuildOrder></CppCompile>
+        <CppCompile Include="src\Modelo\Ciudad.cpp"><BuildOrder>1</BuildOrder></CppCompile>
+        <CppCompile Include="src\Modelo\GestorLogistico.cpp"><BuildOrder>2</BuildOrder></CppCompile>
+        <HppCompile Include="src\Modelo\Ciudad.h"/>
+        <HppCompile Include="src\Modelo\GestorLogistico.h"/>
+        <HppCompile Include="src\Modelo\EstadoOperacion.h"/>
+        <BuildConfiguration Include="Base"><Key>Base</Key></BuildConfiguration>
+        <BuildConfiguration Include="Debug"><Key>Cfg_1</Key><CfgParent>Base</CfgParent></BuildConfiguration>
+        <BuildConfiguration Include="Release"><Key>Cfg_2</Key><CfgParent>Base</CfgParent></BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>CPlusPlusBuilder.Personality.12</Borland.Personality>
+        <Borland.ProjectType>CppConsoleApplication</Borland.ProjectType>
+        <BorlandProject>
+            <Platforms><Platform value="Win64x">True</Platform></Platforms>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Cpp.Targets"/>
+</Project>
