@@ -426,3 +426,15 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+
+# C++Builder: resultados de compilación y configuración local
+/Win64x/
+/Win64/
+/build/
+__history/
+__recovery/
+*.cbproj.local
+*.identcache
+*.dsk
+*.o
+*.tds
