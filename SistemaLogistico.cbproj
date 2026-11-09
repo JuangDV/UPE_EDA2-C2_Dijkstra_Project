@@ -59,8 +59,10 @@
     <ItemGroup>
         <CppCompile Include="src\SistemaLogistico.cpp"><BuildOrder>0</BuildOrder></CppCompile>
         <CppCompile Include="src\Modelo\Ciudad.cpp"><BuildOrder>1</BuildOrder></CppCompile>
-        <CppCompile Include="src\Modelo\GestorLogistico.cpp"><BuildOrder>2</BuildOrder></CppCompile>
+        <CppCompile Include="src\Modelo\Conexion.cpp"><BuildOrder>2</BuildOrder></CppCompile>
+        <CppCompile Include="src\Modelo\GestorLogistico.cpp"><BuildOrder>3</BuildOrder></CppCompile>
         <HppCompile Include="src\Modelo\Ciudad.h"/>
+        <HppCompile Include="src\Modelo\Conexion.h"/>
         <HppCompile Include="src\Modelo\GestorLogistico.h"/>
         <HppCompile Include="src\Modelo\EstadoOperacion.h"/>
         <BuildConfiguration Include="Base"><Key>Base</Key></BuildConfiguration>
