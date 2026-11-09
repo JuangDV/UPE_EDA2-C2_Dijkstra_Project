@@ -4,9 +4,10 @@
 #include "Ciudad.h"
 #include "Conexion.h"
 #include "EstadoOperacion.h"
+#include "HistorialRutas.h"
 #include "ResultadoRuta.h"
 
-// Administra ciudades, conexiones y la matriz de adyacencia de la red.
+// Administra la red, calcula rutas y registra los resultados de la sesión.
 class GestorLogistico
 {
 private:
@@ -18,6 +19,7 @@ private:
     int siguienteId;
     int anchoMapa;
     int altoMapa;
+    HistorialRutas& historial;
 
     int buscarIndiceCiudad(int id) const;
     int buscarIndiceConexion(int origenId, int destinoId) const;
@@ -29,7 +31,7 @@ private:
     static void liberarMatriz(double** matriz, int cantidadCiudades);
 
 public:
-    GestorLogistico();
+    explicit GestorLogistico(HistorialRutas& historial);
     ~GestorLogistico();
     GestorLogistico(const GestorLogistico& otro);
     GestorLogistico& operator=(const GestorLogistico& otro);
@@ -62,7 +64,7 @@ public:
     EstadoOperacion cortarConexion(int origenId, int destinoId);
     EstadoOperacion habilitarConexion(int origenId, int destinoId);
     EstadoOperacion calcularRutaOptima(int origenId, int destinoId,
-        ResultadoRuta& salida) const;
+        ResultadoRuta& salida);
 };
 
 #endif
