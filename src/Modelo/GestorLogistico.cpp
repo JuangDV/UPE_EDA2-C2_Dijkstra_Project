@@ -2,13 +2,15 @@
 
 #include <climits>
 #include <cmath>
+#include <ctime>
 #include <limits>
+#include <stdexcept>
 
-// Crea una red vacía, sin dimensiones configuradas.
-GestorLogistico::GestorLogistico()
+// Crea una red vacía asociada al historial de la sesión.
+GestorLogistico::GestorLogistico(HistorialRutas& historial)
     : ciudades(nullptr), cantidadCiudades(0), conexiones(nullptr),
       cantidadConexiones(0), matrizAdyacencia(nullptr), siguienteId(1),
-      anchoMapa(0), altoMapa(0)
+      anchoMapa(0), altoMapa(0), historial(historial)
 {
 }
 
@@ -25,7 +27,8 @@ GestorLogistico::GestorLogistico(const GestorLogistico& otro)
     : ciudades(nullptr), cantidadCiudades(otro.cantidadCiudades),
       conexiones(nullptr), cantidadConexiones(otro.cantidadConexiones),
       matrizAdyacencia(nullptr), siguienteId(otro.siguienteId),
-      anchoMapa(otro.anchoMapa), altoMapa(otro.altoMapa)
+      anchoMapa(otro.anchoMapa), altoMapa(otro.altoMapa),
+      historial(otro.historial)
 {
     try
     {
@@ -56,7 +59,7 @@ GestorLogistico::GestorLogistico(const GestorLogistico& otro)
     }
 }
 
-// Reemplaza el contenido mediante una copia independiente.
+// Copia la red y conserva el historial asociado al destino.
 GestorLogistico& GestorLogistico::operator=(const GestorLogistico& otro)
 {
     if (this == &otro)
@@ -636,9 +639,9 @@ EstadoOperacion GestorLogistico::habilitarConexion(int origenId, int destinoId)
     return Correcto;
 }
 
-// Calcula el camino de menor distancia sobre la matriz vigente.
+// Calcula el camino mínimo y registra una copia de cada búsqueda exitosa.
 EstadoOperacion GestorLogistico::calcularRutaOptima(
-    int origenId, int destinoId, ResultadoRuta& salida) const
+    int origenId, int destinoId, ResultadoRuta& salida)
 {
     salida = ResultadoRuta();
     int origen = buscarIndiceCiudad(origenId);
@@ -656,6 +659,8 @@ EstadoOperacion GestorLogistico::calcularRutaOptima(
     bool* visitados = nullptr;
     int* predecesores = nullptr;
     int* recorrido = nullptr;
+    std::string* nombres = nullptr;
+    double* tramos = nullptr;
     try
     {
         // Inicializa el estado local del algoritmo.
@@ -735,16 +740,49 @@ EstadoOperacion GestorLogistico::calcularRutaOptima(
         }
         ResultadoRuta encontrado(origenId, destinoId, recorrido, cantidad,
             distancias[destino]);
+
+        // Copia los datos de la red que deben permanecer en el historial.
+        nombres = new std::string[cantidad];
+        tramos = new double[cantidad - 1];
+        for (int posicion = 0; posicion < cantidad; posicion++)
+        {
+            int ciudad = buscarIndiceCiudad(recorrido[posicion]);
+            nombres[posicion] = ciudades[ciudad].obtenerNombre();
+            if (posicion < cantidad - 1)
+            {
+                int siguiente = buscarIndiceCiudad(recorrido[posicion + 1]);
+                tramos[posicion] = matrizAdyacencia[ciudad][siguiente];
+            }
+        }
+
+        // Fecha local del cálculo; una falla impide registrar un éxito incompleto.
+        std::time_t instante = std::time(nullptr);
+        std::tm* fechaLocal = std::localtime(&instante);
+        char fechaHora[20] = {};
+        if (fechaLocal == nullptr ||
+            std::strftime(fechaHora, sizeof(fechaHora),
+                "%Y-%m-%d %H:%M:%S", fechaLocal) == 0)
+        {
+            throw std::runtime_error("No se pudo obtener la fecha local");
+        }
+        RegistroRuta registro(fechaHora, recorrido, nombres, tramos,
+            cantidad, distancias[destino]);
         salida = encontrado;
+        historial.agregarRegistro(registro);
     }
     catch (...)
     {
+        salida = ResultadoRuta();
+        delete[] tramos;
+        delete[] nombres;
         delete[] recorrido;
         delete[] predecesores;
         delete[] visitados;
         delete[] distancias;
         throw;
     }
+    delete[] tramos;
+    delete[] nombres;
     delete[] recorrido;
     delete[] predecesores;
     delete[] visitados;
