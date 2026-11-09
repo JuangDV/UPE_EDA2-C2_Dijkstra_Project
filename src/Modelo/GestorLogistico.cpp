@@ -636,6 +636,122 @@ EstadoOperacion GestorLogistico::habilitarConexion(int origenId, int destinoId)
     return Correcto;
 }
 
+// Calcula el camino de menor distancia sobre la matriz vigente.
+EstadoOperacion GestorLogistico::calcularRutaOptima(
+    int origenId, int destinoId, ResultadoRuta& salida) const
+{
+    salida = ResultadoRuta();
+    int origen = buscarIndiceCiudad(origenId);
+    int destino = buscarIndiceCiudad(destinoId);
+    if (origen == -1 || destino == -1)
+    {
+        return CiudadNoEncontrada;
+    }
+    if (origen == destino)
+    {
+        return OrigenDestinoIguales;
+    }
+
+    double* distancias = nullptr;
+    bool* visitados = nullptr;
+    int* predecesores = nullptr;
+    int* recorrido = nullptr;
+    try
+    {
+        // Inicializa el estado local del algoritmo.
+        distancias = new double[cantidadCiudades];
+        visitados = new bool[cantidadCiudades];
+        predecesores = new int[cantidadCiudades];
+        for (int indice = 0; indice < cantidadCiudades; indice++)
+        {
+            distancias[indice] = std::numeric_limits<double>::infinity();
+            visitados[indice] = false;
+            predecesores[indice] = -1;
+        }
+        distancias[origen] = 0;
+
+        // Fija el candidato alcanzable más próximo; el ID resuelve empates.
+        for (int paso = 0; paso < cantidadCiudades; paso++)
+        {
+            int actual = -1;
+            for (int indice = 0; indice < cantidadCiudades; indice++)
+            {
+                if (visitados[indice] || !std::isfinite(distancias[indice]))
+                {
+                    continue;
+                }
+                if (actual == -1 || distancias[indice] < distancias[actual] ||
+                    (distancias[indice] == distancias[actual] &&
+                     ciudades[indice].obtenerId() <
+                         ciudades[actual].obtenerId()))
+                {
+                    actual = indice;
+                }
+            }
+            if (actual == -1 || actual == destino)
+            {
+                break;
+            }
+            visitados[actual] = true;
+
+            // Relaja únicamente las conexiones dirigidas habilitadas.
+            for (int vecino = 0; vecino < cantidadCiudades; vecino++)
+            {
+                double peso = matrizAdyacencia[actual][vecino];
+                if (visitados[vecino] || !std::isfinite(peso))
+                {
+                    continue;
+                }
+                double propuesta = distancias[actual] + peso;
+                if (propuesta < distancias[vecino])
+                {
+                    distancias[vecino] = propuesta;
+                    predecesores[vecino] = actual;
+                }
+            }
+        }
+
+        if (!std::isfinite(distancias[destino]))
+        {
+            delete[] predecesores;
+            delete[] visitados;
+            delete[] distancias;
+            return SinCamino;
+        }
+
+        // Reconstruye los IDs desde el destino hacia el origen.
+        int cantidad = 0;
+        for (int indice = destino; indice != -1;
+             indice = predecesores[indice])
+        {
+            cantidad++;
+        }
+        recorrido = new int[cantidad];
+        int indice = destino;
+        for (int posicion = cantidad - 1; posicion >= 0; posicion--)
+        {
+            recorrido[posicion] = ciudades[indice].obtenerId();
+            indice = predecesores[indice];
+        }
+        ResultadoRuta encontrado(origenId, destinoId, recorrido, cantidad,
+            distancias[destino]);
+        salida = encontrado;
+    }
+    catch (...)
+    {
+        delete[] recorrido;
+        delete[] predecesores;
+        delete[] visitados;
+        delete[] distancias;
+        throw;
+    }
+    delete[] recorrido;
+    delete[] predecesores;
+    delete[] visitados;
+    delete[] distancias;
+    return Correcto;
+}
+
 // Busca secuencialmente la posición de un identificador estable.
 int GestorLogistico::buscarIndiceCiudad(int id) const
 {

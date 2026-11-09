@@ -4,6 +4,7 @@
 #include "Ciudad.h"
 #include "Conexion.h"
 #include "EstadoOperacion.h"
+#include "ResultadoRuta.h"
 
 // Administra ciudades, conexiones y la matriz de adyacencia de la red.
 class GestorLogistico
@@ -60,6 +61,8 @@ public:
     EstadoOperacion eliminarConexion(int origenId, int destinoId);
     EstadoOperacion cortarConexion(int origenId, int destinoId);
     EstadoOperacion habilitarConexion(int origenId, int destinoId);
+    EstadoOperacion calcularRutaOptima(int origenId, int destinoId,
+        ResultadoRuta& salida) const;
 };
 
 #endif
