@@ -15,7 +15,8 @@ enum EstadoOperacion
     ConexionNoEncontrada,
     ConexionDuplicada,
     DistanciaInvalida,
-    OrigenDestinoIguales
+    OrigenDestinoIguales,
+    SinCamino
 };
 
 #endif
